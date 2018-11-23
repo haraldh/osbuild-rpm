@@ -1,0 +1,19 @@
+interface org.fabrix.osbuild
+
+type User (
+  name: string,
+  uid: ?int,
+  group: ?string,
+  geckos: ?string,
+  shell: ?string,
+  home: ?string,
+  groups: ?[]string
+)
+
+type Group (name: string, gid: ?int)
+
+type Package (
+  name: string,
+  users: ?[]User,
+  groups: ?[]Group
+)
