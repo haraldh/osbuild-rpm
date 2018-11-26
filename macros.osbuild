@@ -109,7 +109,7 @@
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. filename .. ".json <<EOF\\n")
     print("{\\n")
-    print("  \\"name\\": \\"" .. name .. "\\"")
+    print("  \\"name\\": \\"" .. filename .. "\\"")
 \
     local users = rpm.expand("%{?osbuild_useradd_" .. name .. "_users}")
     if users ~= "" then
