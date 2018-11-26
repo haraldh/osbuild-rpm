@@ -5,10 +5,11 @@ Summary:        Export structured data to streamline the creation of operating s
 License:        ASL2.0
 URL:            https://github.com/fabrix/%{name}
 Source0:        https://github.com/fabrix/%{name}/archive/%{name}-%{version}.tar.gz
+BuildRequires:  lua-json
 
 %description
 Export structured data from software packages to streamline the creation,
-update factory-reset of operating system images.
+update, factory-reset of operating system images.
 
 %prep
 %setup -q
