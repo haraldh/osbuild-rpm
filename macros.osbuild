@@ -6,44 +6,18 @@
     -- -S subpackage name
     -- -* useradd options
 \
-    local package = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if package ~= "" then
-        name = name .. "_" .. package
-    end
-\
-    local user = rpm.expand("%{1}")
-    local users = rpm.expand("%{?osbuild_useradd_" .. name .. "_users}")
-    local _,n_users = users:gsub("%S+", "")
-    rpm.define("osbuild_useradd_" .. name .. "_users " .. users .. " " .. user)
-\
-    local group = rpm.expand("%{?-g*}")
-    if group ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_group " .. group)
-    end
-    local gecko = rpm.expand("%{?-c*}")
-    if gecko ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_gecko " .. gecko)
-    end
-    local home = rpm.expand("%{?-d*}")
-    if home ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_home " .. home)
-    end
-    local shell = rpm.expand("%{?-s*}")
-    if shell ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_shell " .. shell)
-    end
-    local uid = rpm.expand("%{?-u*}")
-    if uid ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_uid " .. uid)
-    end
-    local groups = rpm.expand("%{?-G*}")
-    if groups ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_groups " .. groups)
-    end
-\
-    print("Requires(pre): " .. rpm.expand("%{_sbindir}/useradd") .. "\\n")
-    print("Provides: user(" .. user .. ")\\n")
+    local osbuild = require("osbuild")
+    osbuild.useradd(
+	rpm.expand("%{?-S*}"),
+	rpm.expand("%{?!-n*:%{name}}%{?-n*}"),
+	rpm.expand("%{1}"),
+	rpm.expand("%{?-g*}"),
+	rpm.expand("%{?-c*}"),
+	rpm.expand("%{?-d*}"),
+	rpm.expand("%{?-s*}"),
+	rpm.expand("%{?-u*}"),
+	rpm.expand("%{?-G*}")
+    )
 }
 
 %osbuild_groupadd(n:S:g:rfoB:N:) %{lua:
@@ -51,136 +25,33 @@
     -- -S subpackage name
     -- -* groupadd options
 \
-    local package = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if package ~= "" then
-        name = name .. "_" .. package
-    end
-\
-    local group = rpm.expand("%{1}")
-    local groups = rpm.expand("%{?osbuild_groupadd_" .. name .. "_groups}")
-    local _,n_groups = groups:gsub("%S+", "")
-    rpm.define("osbuild_groupadd_" .. name .. "_groups " .. groups .. " " .. group)
-\
-    local gid = rpm.expand("%{?-g*}")
-    if gid ~= "" then
-        rpm.define("osbuild_groupadd_group" .. n_groups .. "_gid " .. gid)
-    end
-\
-    print("Requires(pre): " .. rpm.expand("%{_sbindir}/groupadd") .. "\\n")
-    print("Provides: group(" .. group .. ")\\n")
+    local osbuild = require("osbuild")
+    osbuild.groupadd(
+	rpm.expand("%{?-S*}"),
+	rpm.expand("%{?!-n*:%{name}}%{?-n*}"),
+	rpm.expand("%{1}"),
+	rpm.expand("%{?-g*}")
+    )
 }
 
 %osbuild_pre(n:S:) %{lua:
     -- -n package name
     -- -S subpackage name
 \
-    local package = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    local filename = name
-    if package ~= "" then
-        filename = name .. "-" .. package
-        name = name .. "_" .. package
-    end
-\
-    local users = rpm.expand("%{?osbuild_useradd_" .. name .. "_users}")
-    for user in users:gmatch("%w+") do
-        print(rpm.expand("%{_sbindir}/useradd ") .. user .. "\\n")
-    end
-\
-    local groups = rpm.expand("%{?osbuild_groupadd_" .. name .. "_groups}")
-    for group in groups:gmatch("%w+") do
-        print(rpm.expand("%{_sbindir}/groupadd ") .. group .. "\\n")
-    end
+    local osbuild = require("osbuild")
+    osbuild.pre(
+	rpm.expand("%{?-S*}"),
+	rpm.expand("%{?!-n*:%{name}}%{?-n*}")
+    )
 }
 
 %osbuild_install(n:S:) %{lua:
     -- -n package name
     -- -S subpackage name
 \
-    local package = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    local filename = name
-    if package ~= "" then
-        filename = name .. "-" .. package
-        name = name .. "_" .. package
-    end
-\
-    print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\\n")
-    print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. filename .. ".json <<EOF\\n")
-    print("{\\n")
-    print("  \\"name\\": \\"" .. filename .. "\\"")
-\
-    local users = rpm.expand("%{?osbuild_useradd_" .. name .. "_users}")
-    if users ~= "" then
-        print(",\\n")
-        print("  \\"users\\": [")
-        local first = true
-        local index = 0
-        for user in users:gmatch("%S+") do
-            if not first then
-              print(",")
-            end
-            first = false
-            print("\\n")
-            print("    {\\n")
-            print("      \\"name\\": \\"" .. user .. "\\"")
-            local uid = rpm.expand("%{?osbuild_useradd_" .. name .. "_user" .. index .. "_uid}")
-            if uid ~= "" then
-                print(",\\n")
-                print("      \\"uid\\": " .. uid)
-            end
-            print("\\n")
-            print("    }")
-            index = index + 1
-        end
-        print("\\n")
-        print("  ]")
-    end
-\
-    local groups = rpm.expand("%{?osbuild_groupadd_" .. name .. "_groups}")
-    if groups ~= "" then
-        print(",\\n")
-        print("  \\"groups\\": [")
-        local first = true
-        local index = 0
-        for group in groups:gmatch("%S+") do
-            if not first then
-              print(",")
-            end
-            first = false
-            print("\\n")
-            print("    {\\n")
-            print("      \\"name\\": \\"" .. group .. "\\"")
-            local gid = rpm.expand("%{?osbuild_groupadd_" .. name .. "_group" .. index .. "_gid}")
-            if gid ~= "" then
-                print(",\\n")
-                print("      \\"gid\\": " .. gid)
-            end
-            print("\\n")
-            print("    }")
-        end
-        print("\\n")
-        print("  ]")
-        index = index + 1
-    end
-\
-    print("\\n")
-    print("}\\n")
-    print("EOF\\n")
-}
-
-%osbuild_files(n:S:) %{lua:
-    -- -n package name
-    -- -S subpackage name
-\
-    local package = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    local filename = name
-    if package ~= "" then
-       filename = name .. "-" .. package
-       name = name .. "_" .. package
-    end
-\
-    print(rpm.expand("%{_datarootdir}/osbuild/") .. filename .. ".json\\n")
+    local osbuild = require("osbuild")
+    osbuild.install(
+	rpm.expand("%{?-S*}"),
+	rpm.expand("%{?!-n*:%{name}}%{?-n*}")
+    )
 }
