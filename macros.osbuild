@@ -8,15 +8,15 @@
 \
     local osbuild = require("osbuild")
     osbuild.useradd(
-	rpm.expand("%{?-S*}"),
-	rpm.expand("%{?!-n*:%{name}}%{?-n*}"),
-	rpm.expand("%{1}"),
-	rpm.expand("%{?-g*}"),
-	rpm.expand("%{?-c*}"),
-	rpm.expand("%{?-d*}"),
-	rpm.expand("%{?-s*}"),
-	rpm.expand("%{?-u*}"),
-	rpm.expand("%{?-G*}")
+        rpm.expand("%{?-S*}"),
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}"),
+        rpm.expand("%{1}"),
+        rpm.expand("%{?-g*}"),
+        rpm.expand("%{?-c*}"),
+        rpm.expand("%{?-d*}"),
+        rpm.expand("%{?-s*}"),
+        rpm.expand("%{?-u*}"),
+        rpm.expand("%{?-G*}")
     )
 }
 
@@ -27,10 +27,10 @@
 \
     local osbuild = require("osbuild")
     osbuild.groupadd(
-	rpm.expand("%{?-S*}"),
-	rpm.expand("%{?!-n*:%{name}}%{?-n*}"),
-	rpm.expand("%{1}"),
-	rpm.expand("%{?-g*}")
+        rpm.expand("%{?-S*}"),
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}"),
+        rpm.expand("%{1}"),
+        rpm.expand("%{?-g*}")
     )
 }
 
@@ -40,8 +40,8 @@
 \
     local osbuild = require("osbuild")
     osbuild.pre(
-	rpm.expand("%{?-S*}"),
-	rpm.expand("%{?!-n*:%{name}}%{?-n*}")
+        rpm.expand("%{?-S*}"),
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}")
     )
 }
 
@@ -51,7 +51,18 @@
 \
     local osbuild = require("osbuild")
     osbuild.install(
-	rpm.expand("%{?-S*}"),
-	rpm.expand("%{?!-n*:%{name}}%{?-n*}")
+        rpm.expand("%{?-S*}"),
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}")
+    )
+}
+
+%osbuild_files(n:S:) %{lua:
+    -- -n package name
+    -- -S subpackage name
+\
+    local osbuild = require("osbuild")
+    osbuild.files(
+        rpm.expand("%{?-S*}"),
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}")
     )
 }

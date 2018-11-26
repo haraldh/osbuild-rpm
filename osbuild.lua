@@ -1,5 +1,5 @@
 --[[
-  osbuild - Export structured data to streamline the creation of operating system images
+    osbuild - Export structured data to streamline the creation of operating system images
 ]]
 
 local _G = _G
@@ -66,13 +66,13 @@ local function pre(package, name)
 
     if osbuild[name]["users"] then
        for user,_ in pairs(osbuild[name]["users"]) do
-	  print(rpm.expand("%{_sbindir}/useradd ") .. user .. "\n")
+          print(rpm.expand("%{_sbindir}/useradd ") .. user .. "\n")
        end
     end
 
     if osbuild[name]["groups"] then
        for group,_ in pairs(osbuild[name]["groups"]) do
-	  print(rpm.expand("%{_sbindir}/groupadd ") .. group .. "\n")
+          print(rpm.expand("%{_sbindir}/groupadd ") .. group .. "\n")
        end
     end
 end
@@ -110,19 +110,17 @@ local function files(package, name)
     print(rpm.expand("%{_datarootdir}/osbuild/") .. filename .. ".json\n")
 end
 
-
 local osbuild = {
-	_VERSION = "1.0",
-	_DESCRIPTION = "blah blub",
-	_COPYRIGHT = "Copyright (c)...",
-	useradd = useradd,
-	groupadd = groupadd,
-	pre = pre,
-	install = install
+        _VERSION = "1.0",
+        _DESCRIPTION = "blah blub",
+        _COPYRIGHT = "Copyright (c)...",
+        useradd = useradd,
+        groupadd = groupadd,
+        pre = pre,
+        install = install,
+        files = files
 }
 
 _G.json = osbuild
 
 return osbuild
-
-
