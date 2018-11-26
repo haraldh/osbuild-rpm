@@ -14,31 +14,32 @@
 \
     local user = rpm.expand("%{1}")
     local users = rpm.expand("%{?osbuild_useradd_" .. name .. "_users}")
+    local _,n_users = users:gsub("%S+", "")
     rpm.define("osbuild_useradd_" .. name .. "_users " .. users .. " " .. user)
 \
     local group = rpm.expand("%{?-g*}")
     if group ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_" .. user .. "_group " .. group)
+        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_group " .. group)
     end
     local gecko = rpm.expand("%{?-c*}")
     if gecko ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_" .. user .. "_gecko " .. gecko)
+        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_gecko " .. gecko)
     end
     local home = rpm.expand("%{?-d*}")
     if home ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_" .. user .. "_home " .. home)
+        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_home " .. home)
     end
     local shell = rpm.expand("%{?-s*}")
     if shell ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_" .. user .. "_shell " .. shell)
+        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_shell " .. shell)
     end
     local uid = rpm.expand("%{?-u*}")
     if uid ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_" .. user .. "_uid " .. uid)
+        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_uid " .. uid)
     end
     local groups = rpm.expand("%{?-G*}")
     if groups ~= "" then
-        rpm.define("osbuild_useradd_" .. name .. "_" .. user .. "_groups " .. groups)
+        rpm.define("osbuild_useradd_" .. name .. "_user" .. n_users .. "_groups " .. groups)
     end
 \
     print("Requires(pre): " .. rpm.expand("%{_sbindir}/useradd") .. "\\n")
@@ -58,11 +59,12 @@
 \
     local group = rpm.expand("%{1}")
     local groups = rpm.expand("%{?osbuild_groupadd_" .. name .. "_groups}")
+    local _,n_groups = groups:gsub("%S+", "")
     rpm.define("osbuild_groupadd_" .. name .. "_groups " .. groups .. " " .. group)
 \
     local gid = rpm.expand("%{?-g*}")
     if gid ~= "" then
-        rpm.define("osbuild_groupadd_" .. name .. "_gid " .. gid)
+        rpm.define("osbuild_groupadd_group" .. n_groups .. "_gid " .. gid)
     end
 \
     print("Requires(pre): " .. rpm.expand("%{_sbindir}/groupadd") .. "\\n")
@@ -114,6 +116,7 @@
         print(",\\n")
         print("  \\"users\\": [\\n")
         local first = true
+        local index = 0
         for user in users:gmatch("%w+") do
             if not first then
               print(",")
@@ -122,13 +125,14 @@
             print("\\n")
             print("    {\\n")
             print("      \\"name\\": \\"" .. user .. "\\"")
-            local uid = rpm.expand("%{?osbuild_useradd_" .. name .. "_" .. user .. "_uid}")
+            local uid = rpm.expand("%{?osbuild_useradd_" .. name .. "_user" .. index .. "_uid}")
             if uid ~= "" then
                 print(",\\n")
                 print("      \\"uid\\": " .. uid)
             end
             print("\\n")
             print("    }")
+            index = index + 1
         end
         print("\\n")
         print("  ]")
@@ -139,6 +143,7 @@
         print(",\\n")
         print("  \\"groups\\": [\\n")
         local first = true
+        local index = 0
         for group in groups:gmatch("%w+") do
             if not first then
               print(",")
@@ -147,7 +152,7 @@
             print("\\n")
             print("    {\\n")
             print("      \\"name\\": \\"" .. group .. "\\"")
-            local gid = rpm.expand("%{?osbuild_groupadd_" .. name .. "_" .. group .. "_gid}")
+            local gid = rpm.expand("%{?osbuild_groupadd_" .. name .. "_group" .. index .. "_gid}")
             if gid ~= "" then
                 print(",\\n")
                 print("      \\"gid\\": " .. gid)
@@ -157,6 +162,7 @@
         end
         print("\\n")
         print("  ]")
+        index = index + 1
     end
 \
     print("\\n")

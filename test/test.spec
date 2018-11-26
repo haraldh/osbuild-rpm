@@ -8,7 +8,7 @@ License:        MIT
 BuildArch:      noarch
 
 %define GROUPNAME1 group1
-%define USERNAME1  user1
+%define USERNAME1  user1-baz
 
 %osbuild_groupadd -g 11 %{GROUPNAME1}
 %osbuild_groupadd -g 12 group2
