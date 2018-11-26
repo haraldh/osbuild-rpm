@@ -114,7 +114,7 @@
     local users = rpm.expand("%{?osbuild_useradd_" .. name .. "_users}")
     if users ~= "" then
         print(",\\n")
-        print("  \\"users\\": [\\n")
+        print("  \\"users\\": [")
         local first = true
         local index = 0
         for user in users:gmatch("%S+") do
@@ -141,7 +141,7 @@
     local groups = rpm.expand("%{?osbuild_groupadd_" .. name .. "_groups}")
     if groups ~= "" then
         print(",\\n")
-        print("  \\"groups\\": [\\n")
+        print("  \\"groups\\": [")
         local first = true
         local index = 0
         for group in groups:gmatch("%S+") do
