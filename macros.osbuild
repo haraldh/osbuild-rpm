@@ -117,7 +117,7 @@
         print("  \\"users\\": [\\n")
         local first = true
         local index = 0
-        for user in users:gmatch("%w+") do
+        for user in users:gmatch("%S+") do
             if not first then
               print(",")
             end
@@ -144,7 +144,7 @@
         print("  \\"groups\\": [\\n")
         local first = true
         local index = 0
-        for group in groups:gmatch("%w+") do
+        for group in groups:gmatch("%S+") do
             if not first then
               print(",")
             end
