@@ -15,9 +15,17 @@ local function derror(m)
     rpm.expand("%{error:" .. m .. "}")
 end
 
+local function load_state()
+    return json.decode(rpm.expand("%{?osbuild}"))
+end
+
+local function save_state(s)
+    rpm.define("osbuild {" .. json.encode(s) .. "}")
+end
 
 local function useradd(name, user, group, gecko, home, shell, uid, groups)
-    local osbuild = json.decode(rpm.expand("%{?osbuild}"))
+    local osbuild = load_state()
+
     osbuild = (osbuild or {})
     osbuild[name] = (osbuild[name] or {})
     osbuild[name]["users"] = (osbuild[name]["users"] or {})
@@ -29,28 +37,29 @@ local function useradd(name, user, group, gecko, home, shell, uid, groups)
     osbuild[name]["users"][user]["uid"] = tonumber(uid)
     osbuild[name]["users"][user]["groups"] = groups
 
-    rpm.define("osbuild {" .. json.encode(osbuild) .. "}")
+    save_state(osbuild)
 
     print("Requires(pre): " .. rpm.expand("%{_sbindir}/useradd") .. "\n")
     print("Provides: user(" .. user .. ")\n")
 end
 
 local function groupadd(name, group, gid)
-    local osbuild = json.decode(rpm.expand("%{?osbuild}"))
+    local osbuild = load_state()
+
     osbuild = (osbuild or {})
     osbuild[name] = (osbuild[name] or {})
     osbuild[name]["groups"] = (osbuild[name]["groups"] or {})
     osbuild[name]["groups"][group] = (osbuild[name]["groups"][group] or {})
     osbuild[name]["groups"][group]["gid"] = tonumber(gid)
 
-    rpm.define("osbuild {" .. json.encode(osbuild) .. "}")
+    save_state(osbuild)
 
     print("Requires(pre): " .. rpm.expand("%{_sbindir}/groupadd") .. "\n")
     print("Provides: group(" .. group .. ")\n")
 end
 
 local function pre(name)
-    local osbuild = json.decode(rpm.expand("%{?osbuild}"))
+    local osbuild = load_state()
     if not osbuild[name] then return end
 
     if osbuild[name]["users"] then
@@ -67,7 +76,7 @@ local function pre(name)
 end
 
 local function install(name)
-    local osbuild = json.decode(rpm.expand("%{?osbuild}"))
+    local osbuild = load_state()
     if not osbuild[name] then return end
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. name .. ".json <<EOF\n")
@@ -77,7 +86,7 @@ local function install(name)
 end
 
 local function files(name)
-    local osbuild = json.decode(rpm.expand("%{?osbuild}"))
+    local osbuild = load_state()
     if not osbuild[name] then return end
     print(rpm.expand("%{_datarootdir}/osbuild/") .. name .. ".json\n")
 end
