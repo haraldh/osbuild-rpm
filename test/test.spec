@@ -32,6 +32,14 @@ Summary:         Foo package
 %description -n foo
 This is the foo package.
 
+%package -n bee
+Summary:         Bee Hive
+%osbuild_groupadd -n bee bee
+%osbuild_useradd -n bee -g bee -d /home/🐝 -s /bin/beesh -c %{quote:🐝 Hive} bee
+
+%description -n bee
+This is the bee hive.
+
 %pre
 %osbuild_pre
 
@@ -41,6 +49,9 @@ This is the foo package.
 %pre -n foo
 %osbuild_pre -n foo
 
+%pre -n bee
+%osbuild_pre -n bee
+
 %prep
 
 %build
@@ -48,6 +59,7 @@ This is the foo package.
 %install
 %osbuild_install
 %osbuild_install -n foo
+%osbuild_install -n bee
 %osbuild_install -S sub
 
 %files
@@ -58,3 +70,6 @@ This is the foo package.
 
 %files -n foo
 %osbuild_files -n foo
+
+%files -n bee
+%osbuild_files -n bee
