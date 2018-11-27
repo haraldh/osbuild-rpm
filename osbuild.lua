@@ -132,6 +132,6 @@ local osbuild = {
     files = files
 }
 
-_G.json = osbuild
+_G.osbuild = osbuild
 
 return osbuild
