@@ -15,7 +15,7 @@ BuildArch:      noarch
 %osbuild_groupadd -g 13 group3
 %osbuild_groupadd group4
 %osbuild_useradd -g group1 -G group3,group4 -u 100 -d /var/user1 -s /sbin/nologin -c %{quote:User 1} %{USERNAME1}
-%osbuild_useradd -g group2 -G group3,group4 -d /var/user2 -s /sbin/nologin -c %{quote:User 2} user2
+%osbuild_useradd -g group2 -G group3,group4 -d /var/user$2 -s /sbin/nologin -c %{quote:User 2} user2
 
 %description
 This is the test package.
