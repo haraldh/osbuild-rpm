@@ -18,14 +18,16 @@ update, factory-reset of operating system images.
 install -d %{buildroot}%{_datarootdir}/osbuild
 install -d %{buildroot}%{_prefix}/lib/rpm/macros.d
 install macros.osbuild %{buildroot}%{_prefix}/lib/rpm/macros.d
-install -d %{buildroot}%{_prefix}/lib/rpm/lua
-install osbuild.lua %{buildroot}%{_prefix}/lib/rpm/lua
+install -d %{buildroot}%{_prefix}/lib/rpm/lua/osbuild
+install JSON.lua %{buildroot}%{_prefix}/lib/rpm/lua/osbuild
+install osbuild.lua %{buildroot}%{_prefix}/lib/rpm/lua/osbuild
 
 %files
 %{_datarootdir}/osbuild
 %{_prefix}/lib/rpm/macros.d/macros.osbuild
-%{_prefix}/lib/rpm/lua/osbuild.lua
-%{_prefix}/lib/rpm/lua/JSON.lua
+%{_prefix}/lib/rpm/lua/osbuild
+%{_prefix}/lib/rpm/lua/osbuild/osbuild.lua
+%{_prefix}/lib/rpm/lua/osbuild/JSON.lua
 
 %changelog
 * Fri Nov 23 2018 <kay@redhat.com> 1-1

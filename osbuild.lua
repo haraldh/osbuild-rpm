@@ -4,7 +4,7 @@
 
 local _G = _G
 
-local json = require("JSON")
+local json = require("osbuild/JSON")
 
 local function dwarn(m)
     rpm.expand("%{warn:" .. m .. "}")
@@ -37,10 +37,10 @@ local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     osbuild[pkgname]["users"][user]["uid"] = tonumber(uid)
 
     if groups then
-	osbuild[pkgname]["users"][user]["groups"] = {}
-	for g in groups:gmatch("[^,]*") do
-	    table.insert(osbuild[pkgname]["users"][user]["groups"], g)
-	end
+        osbuild[pkgname]["users"][user]["groups"] = {}
+        for g in groups:gmatch("[^,]*") do
+            table.insert(osbuild[pkgname]["users"][user]["groups"], g)
+        end
     end
 
     save_state(osbuild)
@@ -102,9 +102,8 @@ local function files(pkgname)
 end
 
 local osbuild = {
-    _VERSION = "1.0",
-    _DESCRIPTION = "blah blub",
-    _COPYRIGHT = "Copyright (c)...",
+    _VERSION = "1",
+    _DESCRIPTION = "https://github.com/fabrix/osbuild",
     useradd = useradd,
     groupadd = groupadd,
     pre = pre,

@@ -6,7 +6,7 @@
     -- -S subpackage name
     -- -* useradd options
 \
-    local osbuild = require("osbuild")
+    local osbuild = require("osbuild/osbuild")
     osbuild.useradd(
         rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"),
         rpm.expand("%{1}"),
@@ -24,7 +24,7 @@
     -- -S subpackage name
     -- -* groupadd options
 \
-    local osbuild = require("osbuild")
+    local osbuild = require("osbuild/osbuild")
     osbuild.groupadd(
         rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"),
         rpm.expand("%{1}"),
@@ -36,7 +36,7 @@
     -- -n package name
     -- -S subpackage name
 \
-    local osbuild = require("osbuild")
+    local osbuild = require("osbuild/osbuild")
     osbuild.pre(rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"))
 }
 
@@ -44,7 +44,7 @@
     -- -n package name
     -- -S subpackage name
 \
-    local osbuild = require("osbuild")
+    local osbuild = require("osbuild/osbuild")
     osbuild.install(rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"))
 }
 
@@ -52,6 +52,6 @@
     -- -n package name
     -- -S subpackage name
 \
-    local osbuild = require("osbuild")
+    local osbuild = require("osbuild/osbuild")
     osbuild.files(rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"))
 }
