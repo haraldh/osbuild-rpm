@@ -26,10 +26,7 @@ local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     local osbuild = load_state()
 
     if not osbuild then osbuild = {} end
-    if not osbuild[pkgname] then
-	osbuild[pkgname] = {}
-	osbuild[pkgname]["name"] = pkgname
-    end
+    if not osbuild[pkgname] then osbuild[pkgname] = {} end
     if not osbuild[pkgname]["users"] then osbuild[pkgname]["users"] = {} end
     if not osbuild[pkgname]["users"][user] then osbuild[pkgname]["users"][user] = {} end
 
@@ -56,10 +53,7 @@ local function groupadd(pkgname, group, gid)
     local osbuild = load_state()
 
     if not osbuild then osbuild = {} end
-    if not osbuild[pkgname] then
-	osbuild[pkgname] = {}
-	osbuild[pkgname]["name"] = pkgname
-    end
+    if not osbuild[pkgname] then osbuild[pkgname] = {} end
     if not osbuild[pkgname]["groups"] then osbuild[pkgname]["groups"] = {} end
     if not osbuild[pkgname]["groups"][group] then osbuild[pkgname]["groups"][group] = {} end
 
@@ -94,7 +88,9 @@ local function install(pkgname)
 
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<'EOF'\n")
-    print(json:encode_pretty(osbuild[pkgname]))
+    local pkg = osbuild[pkgname]
+    pkg["name"] = pkgname
+    print(json:encode_pretty(pkg))
     print("\nEOF\n")
 end
 
