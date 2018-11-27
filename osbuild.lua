@@ -95,7 +95,7 @@ local function install(pkgname)
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<'EOF'\n")
     print(json:encode_pretty(osbuild[pkgname]))
-    print("EOF\n")
+    print("\nEOF\n")
 end
 
 local function files(pkgname)
