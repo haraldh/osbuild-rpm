@@ -37,7 +37,7 @@ local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     osbuild[pkgname]["users"][user]["shell"] = shell
     osbuild[pkgname]["users"][user]["uid"] = tonumber(uid)
 
-    if groups then
+    if groups and groups ~= "" then
         osbuild[pkgname]["users"][user]["groups"] = json:newArray(osbuild[pkgname]["users"][user]["groups"])
         for g in groups:gmatch("[^,]*") do
             table.insert(osbuild[pkgname]["users"][user]["groups"], g)
