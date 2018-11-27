@@ -26,10 +26,11 @@ end
 local function useradd(name, user, group, gecko, home, shell, uid, groups)
     local osbuild = load_state()
 
-    osbuild = (osbuild or {})
-    osbuild[name] = (osbuild[name] or {})
-    osbuild[name]["users"] = (osbuild[name]["users"] or {})
-    osbuild[name]["users"][user] = (osbuild[name]["users"][user] or {})
+    if not osbuild then osbuild = {} end
+    if not osbuild[name] then osbuild[name] = {} end
+    if not osbuild[name]["users"] then osbuild[name]["users"] = {} end
+    if not osbuild[name]["users"][user] then osbuild[name]["users"][user] = {} end
+
     osbuild[name]["users"][user]["group"] = group
     osbuild[name]["users"][user]["gecko"] = gecko
     osbuild[name]["users"][user]["home"] = home
@@ -46,10 +47,11 @@ end
 local function groupadd(name, group, gid)
     local osbuild = load_state()
 
-    osbuild = (osbuild or {})
-    osbuild[name] = (osbuild[name] or {})
-    osbuild[name]["groups"] = (osbuild[name]["groups"] or {})
-    osbuild[name]["groups"][group] = (osbuild[name]["groups"][group] or {})
+    if not osbuild then osbuild = {} end
+    if not osbuild[name] then osbuild[name] = {} end
+    if not osbuild[name]["groups"] then osbuild[name]["groups"] = {} end
+    if not osbuild[name]["groups"][group] then osbuild[name]["groups"][group] = {} end
+
     osbuild[name]["groups"][group]["gid"] = tonumber(gid)
 
     save_state(osbuild)
@@ -78,6 +80,7 @@ end
 local function install(name)
     local osbuild = load_state()
     if not osbuild[name] then return end
+
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. name .. ".json <<EOF\n")
     print(json.encode(osbuild[name]))
@@ -88,6 +91,7 @@ end
 local function files(name)
     local osbuild = load_state()
     if not osbuild[name] then return end
+
     print(rpm.expand("%{_datarootdir}/osbuild/") .. name .. ".json\n")
 end
 
