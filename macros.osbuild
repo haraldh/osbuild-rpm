@@ -9,6 +9,7 @@
     local osbuild = require("osbuild/osbuild")
     osbuild.useradd(
         rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"),
+        rpm.expand("%**"),
         rpm.expand("%{1}"),
         rpm.expand("%{?-g*}"),
         rpm.expand("%{?-c*}"),
@@ -27,6 +28,7 @@
     local osbuild = require("osbuild/osbuild")
     osbuild.groupadd(
         rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"),
+        rpm.expand("%**"),
         rpm.expand("%{1}"),
         rpm.expand("%{?-g*}")
     )

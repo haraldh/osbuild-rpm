@@ -23,7 +23,7 @@ local function save_state(s)
     rpm.define("___osbuild {" .. json:encode(s) .. "}")
 end
 
-local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
+local function useradd(pkgname, raw, user, group, gecko, home, shell, uid, groups)
     local osbuild = load_state()
 
     osbuild = json:newObject(osbuild)
@@ -31,6 +31,7 @@ local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     osbuild[pkgname]["users"] = json:newObject(osbuild[pkgname]["users"])
     osbuild[pkgname]["users"][user] = json:newObject(osbuild[pkgname]["users"][user])
 
+    osbuild[pkgname]["users"][user]["_raw"] = raw
     osbuild[pkgname]["users"][user]["group"] = group
     osbuild[pkgname]["users"][user]["gecko"] = gecko
     osbuild[pkgname]["users"][user]["home"] = home
@@ -50,13 +51,14 @@ local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     print("Provides: user(" .. user .. ")\n")
 end
 
-local function groupadd(pkgname, group, gid)
+local function groupadd(pkgname, raw, group, gid)
     local osbuild = load_state()
 
     osbuild = json:newObject(osbuild)
     osbuild[pkgname] = json:newObject(osbuild[pkgname])
     osbuild[pkgname]["groups"] = json:newObject(osbuild[pkgname]["groups"])
     osbuild[pkgname]["groups"][group] = json:newObject(osbuild[pkgname]["groups"][group])
+    osbuild[pkgname]["groups"][group]["_raw"] = raw
 
     if gid then
         osbuild[pkgname]["groups"][group]["gid"] = tonumber(gid)
@@ -72,15 +74,14 @@ local function pre(pkgname)
     local osbuild = load_state()
     if not osbuild[pkgname] then return end
 
-    if osbuild[pkgname]["users"] then
-        for user,_ in pairs(osbuild[pkgname]["users"]) do
-            print(rpm.expand("%{_sbindir}/useradd ") .. user .. "\n")
-        end
-    end
-
     if osbuild[pkgname]["groups"] then
         for group,_ in pairs(osbuild[pkgname]["groups"]) do
-            print(rpm.expand("%{_sbindir}/groupadd ") .. group .. "\n")
+            print(rpm.expand("%{_sbindir}/groupadd ") .. osbuild[pkgname]["groups"][group]["_raw"] .. "\n")
+        end
+    end
+    if osbuild[pkgname]["users"] then
+        for user,_ in pairs(osbuild[pkgname]["users"]) do
+            print(rpm.expand("%{_sbindir}/useradd ") .. osbuild[pkgname]["users"][user]["_raw"] .. "\n")
         end
     end
 end
@@ -93,6 +94,17 @@ local function install(pkgname)
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<'EOF'\n")
     local pkg = osbuild[pkgname]
     pkg["name"] = pkgname
+
+    if pkg["users"] then
+        for user,_ in pairs(pkg["users"]) do
+            pkg["users"][user]["_raw"] = nil
+        end
+    end
+    if pkg["groups"] then
+        for group,_ in pairs(pkg["groups"]) do
+            pkg["groups"][group]["_raw"] = nil
+        end
+    end
     print(json:encode_pretty(pkg))
     print("\nEOF\n")
 end
