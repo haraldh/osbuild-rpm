@@ -5,6 +5,7 @@
 local _G = _G
 
 local json = require("osbuild/JSON")
+json.strictTypes = true
 
 local function dwarn(m)
     rpm.expand("%{warn:" .. m .. "}")
@@ -25,10 +26,10 @@ end
 local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     local osbuild = load_state()
 
-    if not osbuild then osbuild = {} end
-    if not osbuild[pkgname] then osbuild[pkgname] = {} end
-    if not osbuild[pkgname]["users"] then osbuild[pkgname]["users"] = {} end
-    if not osbuild[pkgname]["users"][user] then osbuild[pkgname]["users"][user] = {} end
+    osbuild = json:newObject(osbuild)
+    osbuild[pkgname] = json:newObject(osbuild[pkgname])
+    osbuild[pkgname]["users"] = json:newObject(osbuild[pkgname]["users"])
+    osbuild[pkgname]["users"][user] = json:newObject(osbuild[pkgname]["users"][user])
 
     osbuild[pkgname]["users"][user]["group"] = group
     osbuild[pkgname]["users"][user]["gecko"] = gecko
@@ -37,7 +38,7 @@ local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     osbuild[pkgname]["users"][user]["uid"] = tonumber(uid)
 
     if groups then
-        osbuild[pkgname]["users"][user]["groups"] = {}
+        osbuild[pkgname]["users"][user]["groups"] = json:newArray(osbuild[pkgname]["users"][user]["groups"])
         for g in groups:gmatch("[^,]*") do
             table.insert(osbuild[pkgname]["users"][user]["groups"], g)
         end
@@ -52,12 +53,14 @@ end
 local function groupadd(pkgname, group, gid)
     local osbuild = load_state()
 
-    if not osbuild then osbuild = {} end
-    if not osbuild[pkgname] then osbuild[pkgname] = {} end
-    if not osbuild[pkgname]["groups"] then osbuild[pkgname]["groups"] = {} end
-    if not osbuild[pkgname]["groups"][group] then osbuild[pkgname]["groups"][group] = {} end
+    osbuild = json:newObject(osbuild)
+    osbuild[pkgname] = json:newObject(osbuild[pkgname])
+    osbuild[pkgname]["groups"] = json:newObject(osbuild[pkgname]["groups"])
+    osbuild[pkgname]["groups"][group] = json:newObject(osbuild[pkgname]["groups"][group])
 
-    osbuild[pkgname]["groups"][group]["gid"] = tonumber(gid)
+    if gid then
+        osbuild[pkgname]["groups"][group]["gid"] = tonumber(gid)
+    end
 
     save_state(osbuild)
 
