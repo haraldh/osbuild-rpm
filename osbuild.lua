@@ -16,27 +16,27 @@ local function derror(m)
 end
 
 local function load_state()
-    return json.decode(rpm.expand("%{?osbuild}"))
+    return json.decode(rpm.expand("%{?___osbuild}"))
 end
 
 local function save_state(s)
-    rpm.define("osbuild {" .. json.encode(s) .. "}")
+    rpm.define("___osbuild {" .. json.encode(s) .. "}")
 end
 
-local function useradd(name, user, group, gecko, home, shell, uid, groups)
+local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
     local osbuild = load_state()
 
     if not osbuild then osbuild = {} end
-    if not osbuild[name] then osbuild[name] = {} end
-    if not osbuild[name]["users"] then osbuild[name]["users"] = {} end
-    if not osbuild[name]["users"][user] then osbuild[name]["users"][user] = {} end
+    if not osbuild[pkgname] then osbuild[pkgname] = {} end
+    if not osbuild[pkgname]["users"] then osbuild[pkgname]["users"] = {} end
+    if not osbuild[pkgname]["users"][user] then osbuild[pkgname]["users"][user] = {} end
 
-    osbuild[name]["users"][user]["group"] = group
-    osbuild[name]["users"][user]["gecko"] = gecko
-    osbuild[name]["users"][user]["home"] = home
-    osbuild[name]["users"][user]["shell"] = shell
-    osbuild[name]["users"][user]["uid"] = tonumber(uid)
-    osbuild[name]["users"][user]["groups"] = groups
+    osbuild[pkgname]["users"][user]["group"] = group
+    osbuild[pkgname]["users"][user]["gecko"] = gecko
+    osbuild[pkgname]["users"][user]["home"] = home
+    osbuild[pkgname]["users"][user]["shell"] = shell
+    osbuild[pkgname]["users"][user]["uid"] = tonumber(uid)
+    osbuild[pkgname]["users"][user]["groups"] = groups
 
     save_state(osbuild)
 
@@ -44,15 +44,15 @@ local function useradd(name, user, group, gecko, home, shell, uid, groups)
     print("Provides: user(" .. user .. ")\n")
 end
 
-local function groupadd(name, group, gid)
+local function groupadd(pkgname, group, gid)
     local osbuild = load_state()
 
     if not osbuild then osbuild = {} end
-    if not osbuild[name] then osbuild[name] = {} end
-    if not osbuild[name]["groups"] then osbuild[name]["groups"] = {} end
-    if not osbuild[name]["groups"][group] then osbuild[name]["groups"][group] = {} end
+    if not osbuild[pkgname] then osbuild[pkgname] = {} end
+    if not osbuild[pkgname]["groups"] then osbuild[pkgname]["groups"] = {} end
+    if not osbuild[pkgname]["groups"][group] then osbuild[pkgname]["groups"][group] = {} end
 
-    osbuild[name]["groups"][group]["gid"] = tonumber(gid)
+    osbuild[pkgname]["groups"][group]["gid"] = tonumber(gid)
 
     save_state(osbuild)
 
@@ -60,39 +60,39 @@ local function groupadd(name, group, gid)
     print("Provides: group(" .. group .. ")\n")
 end
 
-local function pre(name)
+local function pre(pkgname)
     local osbuild = load_state()
-    if not osbuild[name] then return end
+    if not osbuild[pkgname] then return end
 
-    if osbuild[name]["users"] then
-        for user,_ in pairs(osbuild[name]["users"]) do
+    if osbuild[pkgname]["users"] then
+        for user,_ in pairs(osbuild[pkgname]["users"]) do
             print(rpm.expand("%{_sbindir}/useradd ") .. user .. "\n")
         end
     end
 
-    if osbuild[name]["groups"] then
-        for group,_ in pairs(osbuild[name]["groups"]) do
+    if osbuild[pkgname]["groups"] then
+        for group,_ in pairs(osbuild[pkgname]["groups"]) do
             print(rpm.expand("%{_sbindir}/groupadd ") .. group .. "\n")
         end
     end
 end
 
-local function install(name)
+local function install(pkgname)
     local osbuild = load_state()
-    if not osbuild[name] then return end
+    if not osbuild[pkgname] then return end
 
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
-    print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. name .. ".json <<EOF\n")
-    print(json.encode(osbuild[name]))
+    print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<EOF\n")
+    print(json.encode(osbuild[pkgname]))
     print("\n")
     print("EOF\n")
 end
 
-local function files(name)
+local function files(pkgname)
     local osbuild = load_state()
-    if not osbuild[name] then return end
+    if not osbuild[pkgname] then return end
 
-    print(rpm.expand("%{_datarootdir}/osbuild/") .. name .. ".json\n")
+    print(rpm.expand("%{_datarootdir}/osbuild/") .. pkgname .. ".json\n")
 end
 
 local osbuild = {
