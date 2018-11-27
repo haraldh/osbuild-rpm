@@ -78,11 +78,11 @@ local function pre(pkgname)
 end
 
 function shell_quote(s)
-  if string.find(s, '[^%w%+%-%=%@%_%/]') or s == '' then
-    return "'" .. string.gsub(s, "'", [['"'"']]) .. "'"
-  else
-    return s
-  end
+    if string.find(s, '[^%w%+%-%=%@%_%/]') or s == '' then
+	return "'" .. string.gsub(s, "'", "'\"'\"'") .. "'"
+    else
+	return s
+    end
 end
 
 local function pretty_json(s)
