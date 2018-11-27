@@ -85,10 +85,6 @@ function shell_quote(s)
   end
 end
 
-function eof_quote(s)
-    return "" .. string.gsub(s, "[$]", [[\$]])
-end
-
 local function pretty_json(s)
     local io = require("io")
     local j = json.encode(s)
@@ -109,8 +105,8 @@ local function install(pkgname)
     if not osbuild[pkgname] then return end
 
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
-    print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<EOF\n")
-    print(eof_quote(pretty_json(osbuild[pkgname])))
+    print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<'EOF'\n")
+    print(pretty_json(osbuild[pkgname]))
     print("EOF\n")
 end
 
