@@ -14,21 +14,21 @@ BuildArch:      noarch
 %osbuild_groupadd -g 12 group2
 %osbuild_groupadd -g 13 group3
 %osbuild_groupadd group4
-%osbuild_useradd -g group1 -G group3,group4 -u 100 -d /var/user1 -s /sbin/nologin -c %{quote:"User 1"} %{USERNAME1}
-%osbuild_useradd -g group2 -G group3,group4 -d /var/user2 -s /sbin/nologin -c %{quote:"User 2"} user2
+%osbuild_useradd -g group1 -G group3,group4 -u 100 -d /var/user1 -s /sbin/nologin -c %{quote:User 1} %{USERNAME1}
+%osbuild_useradd -g group2 -G group3,group4 -d /var/user2 -s /sbin/nologin -c %{quote:User 2} user2
 
 %description
 This is the test package.
 
 %package sub
 Summary:         Test sub package
-%osbuild_groupadd -S sub subgroup1
+%osbuild_groupadd -S sub -g 21 subgroup1
 %description sub
 This is the sub package.
 
 %package -n foo
 Summary:         Foo package
-%osbuild_groupadd -n foo foo1
+%osbuild_groupadd -n foo -g 31 foo1
 %description -n foo
 This is the foo package.
 
