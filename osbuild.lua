@@ -77,14 +77,36 @@ local function pre(pkgname)
     end
 end
 
+function shell_quote(s)
+  if string.find(s, '[^%w%+%-%=%@%_%/]') or s == '' then
+    return "'" .. string.gsub(s, "'", [['"'"']]) .. "'"
+  else
+    return s
+  end
+end
+
+local function pretty_json(s)
+    local io = require("io")
+    local j = json.encode(s)
+    fp = io.popen("printf -- '%s' " .. shell_quote(j) .. " | jq -SM '.'", "r")
+    x = fp:read("*a")
+    fp:close()
+    if not x or x == '' then return j end
+
+    return x
+end
+
+local function not_pretty_json(s)
+    return json.encode(s) .. "\n"
+end
+
 local function install(pkgname)
     local osbuild = load_state()
     if not osbuild[pkgname] then return end
 
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<EOF\n")
-    print(json.encode(osbuild[pkgname]))
-    print("\n")
+    print(pretty_json(osbuild[pkgname]))
     print("EOF\n")
 end
 
