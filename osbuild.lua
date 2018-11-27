@@ -4,7 +4,6 @@
 
 local _G = _G
 
-package.path = package.path .. ";/usr/share/lua/" .. _VERSION:gsub("[^0-9.]+", "") .. "/?.lua"
 local json = require("JSON")
 
 local function dwarn(m)
