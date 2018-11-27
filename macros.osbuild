@@ -6,14 +6,9 @@
     -- -S subpackage name
     -- -* useradd options
 \
-    local subpackage = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if subpackage ~= "" then
-        name = name .. "-" .. subpackage
-    end
     local osbuild = require("osbuild")
     osbuild.useradd(
-        name,
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"),
         rpm.expand("%{1}"),
         rpm.expand("%{?-g*}"),
         rpm.expand("%{?-c*}"),
@@ -29,14 +24,9 @@
     -- -S subpackage name
     -- -* groupadd options
 \
-    local subpackage = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if subpackage ~= "" then
-        name = name .. "-" .. subpackage
-    end
     local osbuild = require("osbuild")
     osbuild.groupadd(
-        name,
+        rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"),
         rpm.expand("%{1}"),
         rpm.expand("%{?-g*}")
     )
@@ -46,37 +36,22 @@
     -- -n package name
     -- -S subpackage name
 \
-    local subpackage = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if subpackage ~= "" then
-        name = name .. "-" .. subpackage
-    end
     local osbuild = require("osbuild")
-    osbuild.pre(name)
+    osbuild.pre(rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"))
 }
 
 %osbuild_install(n:S:) %{lua:
     -- -n package name
     -- -S subpackage name
 \
-    local subpackage = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if subpackage ~= "" then
-        name = name .. "-" .. subpackage
-    end
     local osbuild = require("osbuild")
-    osbuild.install(name)
+    osbuild.install(rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"))
 }
 
 %osbuild_files(n:S:) %{lua:
     -- -n package name
     -- -S subpackage name
 \
-    local subpackage = rpm.expand("%{?-S*}")
-    local name = rpm.expand("%{?!-n*:%{name}}%{?-n*}")
-    if subpackage ~= "" then
-        name = name .. "-" .. subpackage
-    end
     local osbuild = require("osbuild")
-    osbuild.files(name)
+    osbuild.files(rpm.expand("%{?!-n*:%{name}}%{?-n*}%{?-S:-}%{?-S*}"))
 }
