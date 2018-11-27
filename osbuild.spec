@@ -25,6 +25,7 @@ install osbuild.lua %{buildroot}%{_prefix}/lib/rpm/lua
 %{_datarootdir}/osbuild
 %{_prefix}/lib/rpm/macros.d/macros.osbuild
 %{_prefix}/lib/rpm/lua/osbuild.lua
+%{_prefix}/lib/rpm/lua/JSON.lua
 
 %changelog
 * Fri Nov 23 2018 <kay@redhat.com> 1-1

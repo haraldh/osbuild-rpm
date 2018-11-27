@@ -5,7 +5,7 @@
 local _G = _G
 
 package.path = package.path .. ";/usr/share/lua/" .. _VERSION:gsub("[^0-9.]+", "") .. "/?.lua"
-local json = require("json")
+local json = require("JSON")
 
 local function dwarn(m)
     rpm.expand("%{warn:" .. m .. "}")
@@ -16,11 +16,11 @@ local function derror(m)
 end
 
 local function load_state()
-    return json.decode(rpm.expand("%{?___osbuild}"))
+    return json:decode(rpm.expand("%{?___osbuild}"))
 end
 
 local function save_state(s)
-    rpm.define("___osbuild {" .. json.encode(s) .. "}")
+    rpm.define("___osbuild {" .. json:encode(s) .. "}")
 end
 
 local function useradd(pkgname, user, group, gecko, home, shell, uid, groups)
@@ -89,28 +89,13 @@ local function pre(pkgname)
     end
 end
 
-local function pretty_json(s)
-    local io = require("io")
-    local j = json.encode(s)
-    fp = io.popen("jq -SM '.' <<'EOF'\n" .. j .. "\nEOF", "r")
-    x = fp:read("*a")
-    fp:close()
-    if not x or x == '' then return j end
-
-    return x
-end
-
-local function not_pretty_json(s)
-    return json.encode(s) .. "\n"
-end
-
 local function install(pkgname)
     local osbuild = load_state()
     if not osbuild[pkgname] then return end
 
     print("mkdir -p " .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild") .. "\n")
     print("cat >" .. rpm.expand("%{buildroot}%{_datarootdir}/osbuild/") .. pkgname .. ".json <<'EOF'\n")
-    print(pretty_json(osbuild[pkgname]))
+    print(json:encode_pretty(osbuild[pkgname]))
     print("EOF\n")
 end
 
