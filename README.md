@@ -1,4 +1,4 @@
-# osbuild
+# osbuild rpm
 Export of declarative package data to streamline operating system image creation
 
 This is a Fedora-specific package to create information about operating system
